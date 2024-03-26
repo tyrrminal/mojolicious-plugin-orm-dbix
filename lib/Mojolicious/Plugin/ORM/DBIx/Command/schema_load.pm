@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::ORM::DBIx::Command::load_schema;
+package Mojolicious::Plugin::ORM::DBIx::Command::schema_load;
 use v5.26;
 use warnings;
 
@@ -6,7 +6,7 @@ use warnings;
 
 =head1 SYNOPSIS
 
-  Usage: <APP> load_schema [--debug]
+  Usage: <APP> schema-load [--debug]
 
   Options:
     --debug            During load, print generated code to STDERR
