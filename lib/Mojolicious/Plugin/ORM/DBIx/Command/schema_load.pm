@@ -6,27 +6,33 @@ use warnings;
 
 =head1 SYNOPSIS
 
-  Usage: <APP> schema-load [--debug]
+  (re)generate model classes from database schema
+  Usage: <APP> schema-load [--debug] [--[no]quiet]
 
   Options:
     --debug            During load, print generated code to STDERR
+                       Sets --quiet to off
+    --quiet            Suppress "Dumping manual schema ... Schema dump completed" messages.
+                       Default on, use --noquiet to turn off
 
 =cut
 
 use Mojo::Base 'Mojolicious::Command';
-use Getopt::Long qw(GetOptionsFromArray :config pass_through);
+use Getopt::Long qw(GetOptionsFromArray);
 
-use experimental qw(signatures builtin);
+use experimental qw(signatures);
 
-has description => '*Create/update DBIx classes from database';
+has description => '(re)generate model classes from database schema';
 has usage       => sub ($self) { $self->extract_usage };
 
 sub run ($self, @args) {
+  my ($debug, $quiet) = (0,1);
   GetOptionsFromArray(\@args,
-    debug   => \my $debug,
+    debug      => sub { $debug = 1; $quiet = 0 },
+    'quiet!'   => \$quiet,
   );
 
-  $self->app->db->load_schema($debug);
+  $self->app->run_schema_load($debug, $quiet);
 }
 
 =pod
