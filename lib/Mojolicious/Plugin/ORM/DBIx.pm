@@ -51,6 +51,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use DBIx::Class::Schema::Loader qw(make_schema_at);
 use Mojo::Util qw(class_to_path);
+use Module::Load::Conditional qw(check_install);
 use Readonly;
 use Syntax::Keyword::Try;
 use version;
@@ -182,8 +183,13 @@ sub register($self, $app, $conf) {
     $feature_bundle = undef;
   }
 
-  require(class_to_path($namespace));
-  my $schema = $namespace->connect($dsn, @credentials, $connect_params);
+  my $schema;
+  if(check_install(module => $namespace)) {
+    require(class_to_path($namespace));
+    $schema = $namespace->connect($dsn, @credentials, $connect_params);
+  } else {
+    $app->log->fatal("ORM::DBIx error: '$namespace' could not be loaded. ORM functions unavailable; do you need to run schema-load?");
+  }
 
 =pod
 
@@ -209,6 +215,7 @@ Returns the resultset object for the specified model name. Identical to C<app-E<
 
   $app->helper(
     model => sub($c, $model) {
+      return undef unless (defined($schema));
       return $schema->resultset($model);
     }
   );
