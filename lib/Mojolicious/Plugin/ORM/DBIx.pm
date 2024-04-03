@@ -177,7 +177,7 @@ sub register($self, $app, $conf) {
   splice($dbix_components->@*, 0, scalar(@DEFAULT_DBIX_COMPONENTS)) if(scalar($conf_dbix_components->@*) && !defined($conf_dbix_components->[0]));
   
   try {
-    version->declare($feature_bundle); #ensure feature_bundle is a valid version ()
+    version->declare($feature_bundle); #ensure feature_bundle is a properly-formed version number/string
   } catch($e) {
     $app->log->warn("ORM::DBIx ignoring feature_bundle due to invalid version format: $feature_bundle");
     $feature_bundle = undef;
